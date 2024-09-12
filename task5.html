@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Webpage</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        #weather-app {
+            position: relative;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        nav {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 0;
+            position: absolute;
+            top: 0;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .container {
+            z-index: 1;
+            position: relative;
+        }
+
+        .search-box {
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            width: 200px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .weather-info {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+
+        #background-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, #3498db, #8e44ad);
+            z-index: 0;
+            transition: background 1s ease;
+        }
+
+        .cloudy {
+            background: url('https://www.transparenttextures.com/patterns/cloudy.png'), linear-gradient(120deg, #2c3e50, #bdc3c7);
+        }
+
+        .sunny {
+            background: url('https://www.transparenttextures.com/patterns/bright-squares.png'), linear-gradient(120deg, #f39c12, #e67e22);
+        }
+
+        .rainy {
+            background: url('https://www.transparenttextures.com/patterns/dark-denim.png'), linear-gradient(120deg, #34495e, #2c3e50);
+        }
+
+        .clear {
+            background: linear-gradient(120deg, #3498db, #8e44ad);
+        }
+    </style>
+</head>
+<body>
+    <div id="weather-app">
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Weather</a></li>
+                <li><a href="#">About</a></li>
+            </ul>
+        </nav>
+        <div class="container">
+            <h1>Weather Webpage</h1>
+            <div class="search-box">
+                <input type="text" id="location-input" placeholder="Enter city name">
+                <button onclick="getWeather()">Get Weather</button>
+            </div>
+            <div class="weather-info">
+                <h2 id="city-name"></h2>
+                <h3 id="temperature"></h3>
+                <h3 id="weather-description"></h3>
+            </div>
+        </div>
+        <div id="background-animation"></div>
+    </div>
+    <script>
+        const apiKey = '38e60f65d8e644d2ae5165203242508';
+
+        function getWeather() {
+            const location = document.getElementById('location-input').value;
+            if (!location) {
+                alert('Please enter a city name');
+                return;
+            }
+
+            const apiURL = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=no`;
+
+            fetch(apiURL)
+                .then(response => response.json())
+                .then(data => {
+                    const cityName = data.location.name;
+                    const temperature = data.current.temp_c;
+                    const weatherDescription = data.current.condition.text;
+                    const weatherCondition = data.current.condition.code;
+
+                    document.getElementById('city-name').innerText = `Location: ${cityName}`;
+                    document.getElementById('temperature').innerText = `Temperature: ${temperature}°C`;
+                    document.getElementById('weather-description').innerText = `Condition: ${weatherDescription}`;
+
+                    const background = document.getElementById('background-animation');
+
+                    if (weatherDescription.toLowerCase().includes('cloud')) {
+                        background.className = 'cloudy';
+                    } else if (weatherDescription.toLowerCase().includes('rain')) {
+                        background.className = 'rainy';
+                    } else if (weatherDescription.toLowerCase().includes('sunny')) {
+                        background.className = 'sunny';
+                    } else {
+                        background.className = 'clear';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching weather data:', error);
+                    alert('Could not fetch weather data. Please try again.');
+                });
+        }
+    </script>
+</body>
+</html>
